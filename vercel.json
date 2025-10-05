@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
-  "installCommand": "cd diagrams-app && npm install",
-  "buildCommand": "cd diagrams-app && npm run build",
-  "devCommand": "cd diagrams-app && npm run dev"
+  "installCommand": "npm install --prefix diagrams-app",
+  "buildCommand": "npm run build --prefix diagrams-app",
+  "devCommand": "npm run dev --prefix diagrams-app"
 }
