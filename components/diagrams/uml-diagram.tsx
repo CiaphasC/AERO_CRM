@@ -125,9 +125,12 @@ class ClassNodeFactory extends AbstractReactFactory<ClassNodeModel, DiagramEngin
   }
 
   generateReactWidget(event: { model: ClassNodeModel }) {
-    const engine = this.engine;
-  if (!engine) {
-      throw new Error("Diagram engine not initialized");
+    const engine = this.engine as DiagramEngine | undefined;
+    if (!engine) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("ClassNodeFactory render attempted without an active diagram engine.");
+      }
+      return <></>;
     }
     return <ClassNodeWidget node={event.model} engine={engine} />;
   }
@@ -135,7 +138,9 @@ class ClassNodeFactory extends AbstractReactFactory<ClassNodeModel, DiagramEngin
 
 export function UmlDiagram() {
   const buildModel = useCallback((engine: DiagramEngine) => {
-    engine.getNodeFactories().registerFactory(new ClassNodeFactory());
+    const factory = new ClassNodeFactory();
+    factory.setDiagramEngine(engine);
+    engine.getNodeFactories().registerFactory(factory);
 
     const model = new DiagramModel();
 

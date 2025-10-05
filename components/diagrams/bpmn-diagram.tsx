@@ -198,9 +198,12 @@ class BpmnNodeFactory extends AbstractReactFactory<BpmnNodeModel, DiagramEngine>
   }
 
   generateReactWidget(event: { model: BpmnNodeModel }) {
-    const engine = this.engine;
-  if (!engine) {
-      throw new Error("Diagram engine not initialized");
+    const engine = this.engine as DiagramEngine | undefined;
+    if (!engine) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("BpmnNodeFactory render attempted without an active diagram engine.");
+      }
+      return <></>;
     }
     return <BpmnNodeWidget node={event.model} engine={engine} />;
   }
@@ -218,7 +221,9 @@ function stylizeLink(link: DefaultLinkModel, label?: string, color = palette.hig
 
 export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) {
   const buildModel = useCallback((engine: DiagramEngine) => {
-    engine.getNodeFactories().registerFactory(new BpmnNodeFactory());
+    const factory = new BpmnNodeFactory();
+    factory.setDiagramEngine(engine);
+    engine.getNodeFactories().registerFactory(factory);
 
     const model = new DiagramModel();
 
