@@ -71,14 +71,36 @@ export function useDiagramEngine(
 
     setEngine(engineInstance);
 
+    let rafId: ReturnType<typeof requestAnimationFrame> | null = null;
+    let cancelled = false;
+
     if (options.zoomToFit !== false) {
-      requestAnimationFrame(() => {
+      const tryZoomToFit = () => {
+        if (cancelled) {
+          return;
+        }
+
+        const canvas = engineInstance.getCanvas();
+
+        if (!canvas) {
+          rafId = requestAnimationFrame(tryZoomToFit);
+          return;
+        }
+
         engineInstance.zoomToFitNodes({ margin: fitMargin });
         engineInstance.repaintCanvas();
-      });
+        rafId = null;
+      };
+
+      rafId = requestAnimationFrame(tryZoomToFit);
     }
 
     return () => {
+      cancelled = true;
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
       engineInstance.setModel(new DiagramModel());
       setEngine(null);
     };
