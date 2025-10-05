@@ -1,5 +1,7 @@
 # Node
 data/
+!diagrams-app/lib/data/
+!diagrams-app/lib/data/*.ts
 node_modules/
 .npm/
 .pnpm-store/
