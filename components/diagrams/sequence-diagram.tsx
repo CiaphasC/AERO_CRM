@@ -91,9 +91,12 @@ class LifelineFactory extends AbstractReactFactory<LifelineNodeModel, DiagramEng
   }
 
   generateReactWidget(event: { model: LifelineNodeModel }) {
-    const engine = this.engine;
-  if (!engine) {
-      throw new Error("Diagram engine not initialized");
+    const engine = this.engine as DiagramEngine | undefined;
+    if (!engine) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("LifelineFactory render attempted without an active diagram engine.");
+      }
+      return <></>;
     }
     return <LifelineWidget node={event.model} engine={engine} />;
   }
@@ -101,7 +104,9 @@ class LifelineFactory extends AbstractReactFactory<LifelineNodeModel, DiagramEng
 
 export function SequenceDiagram() {
   const buildModel = useCallback((engine: DiagramEngine) => {
-    engine.getNodeFactories().registerFactory(new LifelineFactory());
+    const factory = new LifelineFactory();
+    factory.setDiagramEngine(engine);
+    engine.getNodeFactories().registerFactory(factory);
 
     const model = new DiagramModel();
 

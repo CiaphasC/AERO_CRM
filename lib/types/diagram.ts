@@ -6,6 +6,8 @@ export interface DiagramNodeBlueprint {
   inPorts?: string[];
   outPorts?: string[];
   locked?: boolean;
+  subtitle?: string;
+  accent?: string;
 }
 
 export interface DiagramLinkBlueprint {
