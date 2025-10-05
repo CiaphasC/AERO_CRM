@@ -1,7 +1,14 @@
 "use client";
 
 import { useCallback } from "react";
-import { DiagramModel, DefaultLinkModel, DefaultNodeModel, type DiagramEngine } from "@projectstorm/react-diagrams";
+import {
+  DiagramModel,
+  DefaultLinkModel,
+  DefaultNodeModel,
+  type DiagramEngine,
+} from "@projectstorm/react-diagrams";
+import type { PortModel } from "@projectstorm/react-diagrams-core";
+import { DefaultPortModel } from "@projectstorm/react-diagrams-defaults";
 import { DiagramViewport } from "@/components/diagram-viewport";
 import { useDiagramEngine } from "@/lib/diagram/use-diagram-engine";
 
@@ -36,18 +43,39 @@ function createNode({ name, color, position, inPorts = [], outPorts = [] }: Node
   return node;
 }
 
-function connect(
-  from: DefaultNodeModel,
-  to: DefaultNodeModel,
-  label?: string,
-  color = "#38bdf8",
-) {
-  const source = from.getOutPorts()[0];
-  const target = to.getInPorts()[0];
+interface LinkOptions {
+  label?: string;
+  color?: string;
+  fromPort?: string;
+  toPort?: string;
+}
+
+function resolvePort(
+  node: DefaultNodeModel,
+  preferred: string | undefined,
+  fallback: () => PortModel | undefined,
+): PortModel | null {
+  if (preferred) {
+    const namedPort = node.getPort(preferred);
+    if (namedPort) {
+      return namedPort;
+    }
+  }
+
+  return fallback() ?? null;
+}
+
+function connect(from: DefaultNodeModel, to: DefaultNodeModel, options: LinkOptions = {}) {
+  const { label, color = "#38bdf8", fromPort, toPort } = options;
+
+  const source = resolvePort(from, fromPort, () => from.getOutPorts()[0]);
+  const target = resolvePort(to, toPort, () => to.getInPorts()[0]);
+
   if (!source || !target) {
     return null;
   }
-  const link = source.link(target) as DefaultLinkModel;
+
+  const link = (source as DefaultPortModel).link(target as DefaultPortModel) as DefaultLinkModel;
   link.setColor(color);
   link.setWidth(2);
   link.getOptions().curvyness = 45;
@@ -62,109 +90,111 @@ export function ArchitectureDiagram() {
   const buildModel = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (engine: DiagramEngine) => {
-    const model = new DiagramModel();
+      const model = new DiagramModel();
 
-    const client = createNode({
-      name: "Cliente WhatsApp",
-      color: palette.client,
-      position: { x: 80, y: 320 },
-      outPorts: ["mensaje"],
-    });
+      const client = createNode({
+        name: "Cliente WhatsApp",
+        color: palette.client,
+        position: { x: 80, y: 320 },
+        outPorts: ["mensaje"],
+      });
 
-    const gateway = createNode({
-      name: "Gateway Next.js",
-      color: palette.gateway,
-      position: { x: 340, y: 200 },
-      inPorts: ["webhook"],
-      outPorts: ["evento bot", "flow"],
-    });
+      const gateway = createNode({
+        name: "Gateway Next.js",
+        color: palette.gateway,
+        position: { x: 340, y: 200 },
+        inPorts: ["webhook"],
+        outPorts: ["evento bot", "flow"],
+      });
 
-    const bot = createNode({
-      name: "Bot Conversacional",
-      color: palette.bot,
-      position: { x: 600, y: 120 },
-      inPorts: ["evento"],
-      outPorts: ["payload"],
-    });
+      const bot = createNode({
+        name: "Bot Conversacional",
+        color: palette.bot,
+        position: { x: 600, y: 120 },
+        inPorts: ["evento"],
+        outPorts: ["payload"],
+      });
 
-    const flows = createNode({
-      name: "WhatsApp Flows",
-      color: palette.flow,
-      position: { x: 600, y: 320 },
-      inPorts: ["activar"],
-      outPorts: ["datos"],
-    });
+      const flows = createNode({
+        name: "WhatsApp Flows",
+        color: palette.flow,
+        position: { x: 600, y: 320 },
+        inPorts: ["activar"],
+        outPorts: ["datos"],
+      });
 
-    const orchestrator = createNode({
-      name: "n8n Orchestrator",
-      color: palette.orchestrator,
-      position: { x: 860, y: 220 },
-      inPorts: ["payload"],
-      outPorts: ["resultado", "evento"],
-    });
+      const orchestrator = createNode({
+        name: "n8n Orchestrator",
+        color: palette.orchestrator,
+        position: { x: 860, y: 220 },
+        inPorts: ["payload"],
+        outPorts: ["resultado", "evento"],
+      });
 
-    const supabase = createNode({
-      name: "Supabase",
-      color: palette.supabase,
-      position: { x: 1120, y: 180 },
-      inPorts: ["guardar"],
-      outPorts: ["consultar"],
-    });
+      const supabase = createNode({
+        name: "Supabase",
+        color: palette.supabase,
+        position: { x: 1120, y: 180 },
+        inPorts: ["guardar"],
+        outPorts: ["consultar"],
+      });
 
-    const analytics = createNode({
-      name: "Analytics",
-      color: palette.analytics,
-      position: { x: 1120, y: 360 },
-      inPorts: ["evento"],
-    });
+      const analytics = createNode({
+        name: "Analytics",
+        color: palette.analytics,
+        position: { x: 1120, y: 360 },
+        inPorts: ["evento"],
+      });
 
-    const agent = createNode({
-      name: "Agente CRM",
-      color: palette.agent,
-      position: { x: 860, y: 420 },
-      inPorts: ["caso"],
-      outPorts: ["respuesta"],
-    });
+      const agent = createNode({
+        name: "Agente CRM",
+        color: palette.agent,
+        position: { x: 860, y: 420 },
+        inPorts: ["caso"],
+        outPorts: ["respuesta"],
+      });
 
-    const whatsapp = createNode({
-      name: "WhatsApp API",
-      color: palette.whatsapp,
-      position: { x: 1120, y: 520 },
-      inPorts: ["mensaje"],
-      outPorts: ["al cliente"],
-    });
+      const whatsapp = createNode({
+        name: "WhatsApp API",
+        color: palette.whatsapp,
+        position: { x: 1120, y: 520 },
+        inPorts: ["mensaje"],
+        outPorts: ["al cliente"],
+      });
 
-    const nodes = [
-      client,
-      gateway,
-      bot,
-      flows,
-      orchestrator,
-      supabase,
-      analytics,
-      agent,
-      whatsapp,
-    ];
+      const nodes = [
+        client,
+        gateway,
+        bot,
+        flows,
+        orchestrator,
+        supabase,
+        analytics,
+        agent,
+        whatsapp,
+      ];
 
-    const links = [
-      connect(client, gateway, "Mensaje"),
-      connect(gateway, bot, "Webhook"),
-      connect(bot, orchestrator, "Evento limpio"),
-      connect(gateway, flows, "Flow"),
-      connect(flows, orchestrator, "Datos flow"),
-      connect(orchestrator, supabase, "Persistencia"),
-      connect(supabase, orchestrator, "Consultas"),
-      connect(orchestrator, analytics, "Metricas"),
-      connect(orchestrator, agent, "Asignacion"),
-      connect(agent, whatsapp, "Respuesta"),
-      connect(whatsapp, client, "Mensaje final"),
-    ].filter((link): link is DefaultLinkModel => Boolean(link));
+      const links = [
+        connect(client, gateway, { label: "Mensaje" }),
+        connect(gateway, bot, { label: "Webhook", fromPort: "evento bot", toPort: "evento" }),
+        connect(bot, orchestrator, { label: "Evento limpio", fromPort: "payload", toPort: "payload" }),
+        connect(gateway, flows, { label: "Flow", fromPort: "flow", toPort: "activar" }),
+        connect(flows, orchestrator, { label: "Datos flow", fromPort: "datos", toPort: "payload" }),
+        connect(orchestrator, supabase, { label: "Persistencia", fromPort: "resultado", toPort: "guardar" }),
+        connect(supabase, orchestrator, { label: "Consultas", fromPort: "consultar", toPort: "payload" }),
+        connect(orchestrator, analytics, { label: "Metricas", fromPort: "evento", toPort: "evento" }),
+        connect(orchestrator, agent, { label: "Asignacion", fromPort: "resultado", toPort: "caso" }),
+        connect(agent, whatsapp, { label: "Respuesta", fromPort: "respuesta", toPort: "mensaje" }),
+        connect(whatsapp, client, { label: "Mensaje final", fromPort: "al cliente", toPort: "mensaje" }),
+      ].filter((link): link is DefaultLinkModel => Boolean(link));
 
-    model.addAll(...nodes, ...links);
-    model.setLocked(true);
+      model.addAll(...nodes, ...links);
+      model.setLocked(true);
 
-    return model;
-  }, []);
+      return model;
+    },
+    [],
+  );
 
   const { engine, fitMargin } = useDiagramEngine(buildModel, [], { zoomToFit: true, fitMargin: 90 });
 
