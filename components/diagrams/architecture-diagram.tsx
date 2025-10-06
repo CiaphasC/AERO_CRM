@@ -243,7 +243,6 @@ function createNode({ name, color, accent, position, inPorts = [], outPorts = []
 
 export function ArchitectureDiagram() {
   const buildModel = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (engine: DiagramEngine) => {
       const factory = new ArchitectureNodeFactory();
       factory.setDiagramEngine(engine);

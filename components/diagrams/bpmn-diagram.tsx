@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback } from "react";
-import type { ReactElement } from "react";
 import { DiagramModel, DefaultLinkModel, type DiagramEngine } from "@projectstorm/react-diagrams";
 import { AbstractReactFactory } from "@projectstorm/react-canvas-core";
 import { NodeModel, PortModel, PortModelAlignment, PortWidget } from "@projectstorm/react-diagrams-core";
