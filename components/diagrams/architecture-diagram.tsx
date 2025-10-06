@@ -3,12 +3,14 @@
 import { useCallback } from "react";
 import { DiagramModel, DefaultLinkModel, type DiagramEngine } from "@projectstorm/react-diagrams";
 import { NodeModel, PortModel, PortModelAlignment, PortWidget } from "@projectstorm/react-diagrams-core";
+import type { BasePositionModelOptions } from "@projectstorm/react-canvas-core";
 import type { NodeModelGenerics } from "@projectstorm/react-diagrams-core/dist/@types/entities/node/NodeModel";
 import { DefaultPortModel } from "@projectstorm/react-diagrams-defaults";
 import { DiagramViewport } from "@/components/diagram-viewport";
 import { useDiagramEngine } from "@/lib/diagram/use-diagram-engine";
 import { AbstractReactFactory } from "@projectstorm/react-canvas-core";
 import type { DefaultPortModelOptions } from "@projectstorm/react-diagrams-defaults";
+import { Point } from "@projectstorm/geometry";
 
 const palette = {
   client: { base: "#0a1929", accent: "#38bdf8" },
@@ -47,7 +49,11 @@ type ArchitectureNodeGenerics = NodeModelGenerics & {
 
 class ArchitectureNodeModel extends NodeModel<ArchitectureNodeGenerics> {
   constructor(options: ArchitectureNodeOptions) {
-    super({ type: "architecture-node" });
+    const positionPoint = new Point(options.position.x, options.position.y);
+    super({
+      type: "architecture-node",
+      position: positionPoint,
+    } as BasePositionModelOptions & ArchitectureNodeOptions);
     this.options = {
       ...this.options,
       name: options.name,
@@ -198,7 +204,6 @@ function connect(from: ArchitectureNodeModel, to: ArchitectureNodeModel, options
   link.setWidth(lineWidth);
   link.getOptions().curvyness = curvyness ?? 32;
   link.getOptions().selectedColor = strokeColor;
-  link.getOptions().selectedWidth = lineWidth + 0.6;
   if (label) {
     link.addLabel(label);
   }
