@@ -81,27 +81,29 @@ class JourneyNodeModel extends NodeModel<JourneyNodeGenerics> {
   }
 }
 
-function JourneyPortAnchor({ port, engine }: { port: PortModel | null | undefined; engine: DiagramEngine }) {
+function JourneyPortAnchor({ port, engine, accent }: { port: PortModel | null | undefined; engine: DiagramEngine; accent: string }) {
   if (!port) {
     return null;
   }
   const options = port.getOptions() as DefaultPortModelOptions & { extras?: { index?: number; total?: number } };
-  const { alignment, name } = options;
-  const isLeft = alignment === PortModelAlignment.LEFT;
+  const isLeft = options.alignment === PortModelAlignment.LEFT;
   const total = options.extras?.total ?? 1;
   const index = options.extras?.index ?? 0;
   const topPercentage = total === 1 ? 50 : (index / (total - 1)) * 100;
   const container = `absolute top-1/2 flex -translate-y-1/2 items-center gap-2 ${
-    isLeft ? "-left-6 flex-row-reverse text-right" : "-right-6 text-left"
+    isLeft ? "-left-10 flex-row-reverse text-right" : "-right-10 text-left"
   }`;
 
   return (
     <PortWidget engine={engine} port={port}>
       <div className={container} style={{ top: `${topPercentage}%` }}>
-        <span className="rounded-full border border-white/20 bg-slate-900/85 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/80 shadow-lg backdrop-blur">
-          {name}
+        <span className="rounded-full border border-white/12 bg-slate-950/85 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/70 shadow-[0_6px_12px_rgba(8,15,28,0.35)]">
+          {options.name}
         </span>
-        <span className="h-3 w-3 rounded-full border-2 border-white/80 bg-slate-950 shadow-[0_0_0_3px_rgba(10,16,30,0.9)]" />
+        <span
+          className="h-3 w-3 rounded-full border-2 bg-slate-950 shadow-[0_0_0_4px_rgba(8,15,28,0.75)]"
+          style={{ borderColor: accent, boxShadow: `0 0 0 4px rgba(8,15,28,0.75), 0 0 12px 2px ${accent}55` }}
+        />
       </div>
     </PortWidget>
   );
@@ -109,42 +111,54 @@ function JourneyPortAnchor({ port, engine }: { port: PortModel | null | undefine
 
 function JourneyNodeWidget({ node, engine }: { node: JourneyNodeModel; engine: DiagramEngine }) {
   const options = node.getOptions() as JourneyNodeOptions;
+  const accent = options.accent ?? options.color;
+  const overlay = `linear-gradient(135deg, ${withAlpha(accent, 0.22)}, ${withAlpha(options.color, 0.85)})`;
   const ports = Object.values(node.getPorts()) as DefaultPortModel[];
   const inPorts = ports.filter((port) => port.getOptions().in);
   const outPorts = ports.filter((port) => !port.getOptions().in);
-  const accentOverlay = `linear-gradient(145deg, ${withAlpha(options.accent, 0.35)}, ${withAlpha(options.color, 0.9)})`;
 
   return (
     <div className="relative flex items-center">
       {inPorts.map((port) => (
-        <JourneyPortAnchor key={port.getID()} port={port} engine={engine} />
+        <JourneyPortAnchor key={port.getID()} port={port} engine={engine} accent={accent} />
       ))}
-      <div className="relative w-64 overflow-hidden rounded-2xl border border-white/15 bg-slate-950/80 p-5 text-slate-100 shadow-[0_25px_50px_-12px_rgba(15,23,42,0.65)] backdrop-blur">
-        <div className="absolute inset-0" style={{ background: accentOverlay, opacity: 0.92 }} />
-        <div className="relative flex flex-col gap-3">
-          <div className="flex flex-col gap-1">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/70">Etapa</span>
-            <h3 className="text-xl font-semibold text-white drop-shadow-sm">{options.label}</h3>
+      <div
+        className="relative w-72 max-w-sm overflow-hidden rounded-[28px] border border-white/12 bg-slate-950/85 px-6 py-6 text-slate-100 shadow-[0_28px_60px_-20px_rgba(9,17,31,0.55)] backdrop-blur"
+      >
+        <div className="absolute inset-0" style={{ background: overlay, opacity: 0.92 }} />
+        <div
+          className="absolute inset-x-6 top-0 h-1 rounded-full"
+          style={{ background: `linear-gradient(90deg, ${withAlpha(accent, 0.75)}, transparent)` }}
+        />
+        <div className="relative flex flex-col gap-4">
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/70">Etapa</span>
+            <span className="rounded-full border border-white/15 bg-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/80">
+              Journey
+            </span>
           </div>
-          {options.subtitle ? (
-            <p className="text-sm leading-relaxed text-white/80">{options.subtitle}</p>
-          ) : null}
+          <div className="flex flex-col gap-2">
+            <h3 className="text-xl font-semibold text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)]">{options.label}</h3>
+            {options.subtitle ? (
+              <p className="text-sm leading-relaxed text-white/80">{options.subtitle}</p>
+            ) : null}
+          </div>
           {(options.inPorts.length > 0 || options.outPorts.length > 0) && (
-            <div className="mt-1 flex flex-wrap gap-2 text-[11px] font-medium text-white/75">
+            <div className="flex flex-wrap gap-2 text-[11px] font-medium text-white/80">
               {options.inPorts.map((label) => (
                 <span
                   key={`in-${label}`}
-                  className="rounded-full border border-white/20 bg-white/15 px-2 py-0.5 uppercase tracking-wide text-[10px] text-white/85"
+                  className="rounded-full border border-white/18 bg-white/10 px-2 py-0.5 uppercase tracking-wide text-[10px] text-white/85"
                 >
-                  ← {label}
+                  {label}
                 </span>
               ))}
               {options.outPorts.map((label) => (
                 <span
                   key={`out-${label}`}
-                  className="rounded-full border border-white/15 bg-white/10 px-2 py-0.5 uppercase tracking-wide text-[10px] text-white/85"
+                  className="rounded-full border border-white/12 bg-white/8 px-2 py-0.5 uppercase tracking-wide text-[10px] text-white/80"
                 >
-                  {label} →
+                  {label}
                 </span>
               ))}
             </div>
@@ -152,7 +166,7 @@ function JourneyNodeWidget({ node, engine }: { node: JourneyNodeModel; engine: D
         </div>
       </div>
       {outPorts.map((port) => (
-        <JourneyPortAnchor key={port.getID()} port={port} engine={engine} />
+        <JourneyPortAnchor key={port.getID()} port={port} engine={engine} accent={accent} />
       ))}
     </div>
   );
@@ -196,7 +210,7 @@ function createNode(definition: DiagramNodeBlueprint) {
     outPorts: definition.outPorts ?? [],
   });
   node.setPosition(definition.position.x, definition.position.y);
-  node.setLocked(definition.locked ?? true);
+  node.setLocked(definition.locked ?? false);
   node.setSelected(false);
   return node;
 }
@@ -237,13 +251,17 @@ function connectLink(
   }
 
   const link = (source as DefaultPortModel).link(target as DefaultPortModel) as DefaultLinkModel;
-  link.setColor(definition.color ?? defaults.color);
-  link.setWidth(definition.width ?? defaults.width);
+  const accent = definition.color ?? defaults.color;
+  const width = definition.width ?? defaults.width;
+  link.setColor(accent);
+  link.setWidth(width);
   link.getOptions().curvyness = definition.curvyness ?? defaults.curvyness;
+  link.getOptions().selectedColor = accent;
+  link.getOptions().selectedWidth = width + 0.6;
   if (definition.label) {
     link.addLabel(definition.label);
   }
-  link.setLocked(definition.locked ?? true);
+  link.setLocked(definition.locked ?? false);
   return link;
 }
 
@@ -276,8 +294,8 @@ export function JourneyDiagram({ blueprint }: JourneyDiagramProps) {
 
       const defaults = {
         color: blueprint.defaultLinkColor ?? "#38bdf8",
-        width: blueprint.defaultLinkWidth ?? 2.1,
-        curvyness: blueprint.defaultCurvyness ?? 40,
+        width: blueprint.defaultLinkWidth ?? 2.4,
+        curvyness: blueprint.defaultCurvyness ?? 26,
       };
 
       const linkModels = blueprint.links
@@ -285,7 +303,7 @@ export function JourneyDiagram({ blueprint }: JourneyDiagramProps) {
         .filter((link): link is DefaultLinkModel => Boolean(link));
 
       model.addAll(...nodeModels, ...linkModels);
-      model.setLocked(blueprint.lockDiagram ?? true);
+      model.setLocked(blueprint.lockDiagram ?? false);
 
       return model;
     },
@@ -293,8 +311,8 @@ export function JourneyDiagram({ blueprint }: JourneyDiagramProps) {
   );
 
   const { engine, fitMargin } = useDiagramEngine(buildModel, [blueprint], {
-    zoomToFit: false,
-    fitMargin: 80,
+    zoomToFit: true,
+    fitMargin: 150,
   });
 
   return (
@@ -307,3 +325,4 @@ export function JourneyDiagram({ blueprint }: JourneyDiagramProps) {
     />
   );
 }
+

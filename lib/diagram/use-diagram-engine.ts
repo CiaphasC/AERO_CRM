@@ -97,6 +97,14 @@ export function useDiagramEngine(
         return pendingFit;
       }
 
+      const canvas = engineInstance.getCanvas();
+      if (!canvas) {
+        pendingFit = fontsReadyPromise.then(() => {
+          pendingFit = null;
+        });
+        return pendingFit;
+      }
+
       pendingFit = Promise.all([fontsReadyPromise, engineInstance.repaintCanvas(true)])
         .then(() => {
           pendingFit = null;

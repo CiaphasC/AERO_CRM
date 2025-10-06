@@ -32,12 +32,19 @@ type BpmnNodeGenerics = NodeModelGenerics & {
   OPTIONS: BpmnConfig;
 };
 const palette = {
-  event: "#0c1729",
-  gateway: "#1f2937",
-  task: "#0f1f33",
-  subprocess: "#131f33",
+  event: { base: "#0f1d2f", accent: "#38bdf8" },
+  gateway: { base: "#19222f", accent: "#facc15" },
+  task: { base: "#101c2b", accent: "#4f46e5" },
+  subprocess: { base: "#132033", accent: "#22d3ee" },
   highlight: "#38bdf8",
 };
+
+const variantPalette = {
+  event: palette.event,
+  gateway: palette.gateway,
+  task: palette.task,
+  subprocess: palette.subprocess,
+} as const;
 
 class BpmnNodeModel extends NodeModel<BpmnNodeGenerics> {
   constructor(options: BpmnOptions) {
@@ -51,7 +58,7 @@ class BpmnNodeModel extends NodeModel<BpmnNodeGenerics> {
       label: options.label,
       variant: options.variant,
       tech: options.tech,
-      color: options.color ?? palette.task,
+      color: options.color ?? variantPalette[options.variant].base,
       inPort: options.inPort ?? true,
       outPort: options.outPort ?? true,
     } as never;
@@ -103,87 +110,129 @@ class BpmnNodeModel extends NodeModel<BpmnNodeGenerics> {
   }
 }
 
-function PortHandle({ port, engine, position }: { port: PortModel | null | undefined; engine: DiagramEngine; position: "left" | "right" }) {
+function PortHandle({ port, engine, position, variant }: { port: PortModel | null | undefined; engine: DiagramEngine; position: "left" | "right"; variant: BpmnOptions["variant"] }) {
   if (!port) {
     return null;
   }
-  const base = "absolute top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border-2 border-slate-100 bg-slate-950";
   const side = position === "left" ? "-left-3" : "-right-3";
+  const accent = palette[variant]?.accent ?? palette.highlight;
   return (
     <PortWidget engine={engine} port={port}>
-      <div className={cn(base, side)} />
+      <div
+        className={cn("absolute top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border-2 bg-slate-950 shadow-[0_0_0_4px_rgba(8,15,28,0.8)]", side)}
+        style={{ borderColor: accent, boxShadow: `0 0 0 4px rgba(8,15,28,0.8), 0 0 12px 2px ${accent}44` }}
+      />
     </PortWidget>
   );
 }
 function BpmnNodeWidget({ node, engine }: { node: BpmnNodeModel; engine: DiagramEngine }) {
-  const { variant, label, tech, color } = node.getOptions() as BpmnOptions & {
+  const { variant, label, tech } = node.getOptions() as BpmnOptions & {
     color: string;
     inPort: boolean;
     outPort: boolean;
   };
 
-  const techPill =
-    tech && tech.length > 0 ? (
-      <span className="rounded-full border border-white/15 bg-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wide text-slate-200">
-        {tech}
-      </span>
-    ) : null;
-
-  let content: ReactElement;
-
-  switch (variant) {
-    case "event":
-      content = (
-        <div
-          className="flex h-24 w-24 flex-col items-center justify-center gap-2 rounded-full border-4 bg-slate-950/85 text-center text-xs font-semibold text-slate-100 shadow-lg"
-          style={{ borderColor: color }}
-        >
-          {techPill}
-          <span>{label}</span>
+  const variantMeta = {
+    event: {
+      wrapper: "h-28 w-28",
+      render: () => (
+        <div className="relative flex h-28 w-28 items-center justify-center">
+          <div
+            className="absolute inset-0 rounded-full border-4 shadow-[0_0_30px_rgba(56,189,248,0.15)]"
+            style={{ borderColor: palette.event.accent, background: "linear-gradient(160deg, rgba(56,189,248,0.18), rgba(8,47,73,0.9))" }}
+          />
+          <div className="relative flex flex-col items-center gap-2 text-center text-xs font-semibold text-white">
+            {tech ? (
+              <span className="rounded-full border border-white/20 bg-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/75">
+                {tech}
+              </span>
+            ) : null}
+            <span className="text-base font-semibold">{label}</span>
+          </div>
         </div>
-      );
-      break;
-    case "gateway":
-      content = (
+      ),
+    },
+    gateway: {
+      wrapper: "h-28 w-28",
+      render: () => (
         <div className="relative h-28 w-28">
-          <div className="absolute inset-0 rotate-45 rounded-lg border-4 border-amber-400/80 bg-slate-950/85 shadow-lg" />
+          <div
+            className="absolute inset-0 rotate-45 rounded-[22px] border-4 shadow-[0_0_30px_rgba(250,204,21,0.18)]"
+            style={{ borderColor: palette.gateway.accent, background: "linear-gradient(150deg, rgba(250,204,21,0.18), rgba(46,34,20,0.95))" }}
+          />
           <div className="absolute inset-0 flex rotate-45 items-center justify-center">
-            <div className="-rotate-45 flex flex-col items-center gap-1 text-center text-xs font-semibold text-amber-100">
-              {techPill}
-              <span>{label}</span>
+            <div className="-rotate-45 flex flex-col items-center gap-2 text-center text-xs font-semibold text-white">
+              {tech ? (
+                <span className="rounded-full border border-white/20 bg-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/75">
+                  {tech}
+                </span>
+              ) : null}
+              <span className="text-base font-semibold">{label}</span>
             </div>
           </div>
         </div>
-      );
-      break;
-    case "subprocess":
-      content = (
-        <div className="relative flex h-32 w-52 flex-col items-center justify-center gap-3 rounded-2xl border-2 border-white/12 bg-slate-950/85 px-6 text-center text-sm text-slate-100 shadow-xl">
-          <div className="absolute inset-3 rounded-2xl border border-white/12" />
-          <div className="relative flex flex-col items-center gap-2">
-            {techPill}
-            <span className="font-semibold">{label}</span>
+      ),
+    },
+    subprocess: {
+      wrapper: "w-72",
+      render: () => (
+        <div
+          className="relative w-72 max-w-full overflow-hidden rounded-3xl border border-white/15 bg-slate-950/82 px-6 py-6 text-slate-100 backdrop-blur"
+          style={{ boxShadow: `0 25px 55px -18px ${palette.subprocess.accent}26` }}
+        >
+          <div
+            className="absolute inset-1 rounded-3xl border border-dashed border-white/20"
+            style={{ boxShadow: "inset 0 0 0 1px rgba(34,211,238,0.18)" }}
+          />
+          <div className="relative flex flex-col gap-3">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/60">Subproceso</span>
+              {tech ? (
+                <span className="rounded-full border border-white/20 bg-white/10 px-3 py-0.5 text-[11px] uppercase tracking-wide text-white/80">
+                  {tech}
+                </span>
+              ) : null}
+            </div>
+            <h3 className="text-xl font-semibold text-white">{label}</h3>
+            <p className="text-sm text-white/75">Agrupa tareas paralelas y control de metricas, inspirado en n8n.</p>
           </div>
         </div>
-      );
-      break;
-    default:
-      content = (
-        <div className="flex h-28 w-56 flex-col items-center justify-center gap-2 rounded-xl border border-white/12 bg-slate-950/85 px-6 text-center text-sm text-slate-100 shadow-lg">
-          {techPill}
-          <span className="font-semibold">{label}</span>
+      ),
+    },
+    task: {
+      wrapper: "w-64",
+      render: () => (
+        <div
+          className="relative w-64 overflow-hidden rounded-2xl border border-white/12 bg-slate-950/86 px-6 py-5 text-slate-100 backdrop-blur"
+          style={{ boxShadow: `0 22px 45px -18px ${palette.task.accent}38` }}
+        >
+          <div
+            className="absolute inset-y-0 left-0 w-1 rounded-l-2xl"
+            style={{ background: `linear-gradient(180deg, ${palette.task.accent}85, ${palette.task.accent}00)` }}
+          />
+          <div className="relative flex flex-col gap-3">
+            <div className="flex items-center justify-between gap-3 text-[11px] uppercase tracking-[0.2em] text-white/65">
+              <span>Tarea</span>
+              {tech ? (
+                <span className="rounded-full border border-white/15 bg-white/10 px-2 py-0.5 text-[10px] text-white/75">{tech}</span>
+              ) : null}
+            </div>
+            <h3 className="text-lg font-semibold text-white">{label}</h3>
+          </div>
         </div>
-      );
-  }
+      ),
+    },
+  } as const;
 
+  const content = variantMeta[variant]?.render() ?? null;
   const inPort = node.getPort("in");
   const outPort = node.getPort("out");
 
   return (
-    <div className="relative flex items-center justify-center">
-      {inPort && <PortHandle port={inPort} engine={engine} position="left" />}
+    <div className={cn("relative flex items-center justify-center", variantMeta[variant]?.wrapper)}>
+      {inPort && <PortHandle port={inPort} engine={engine} position="left" variant={variant} />}
       {content}
-      {outPort && <PortHandle port={outPort} engine={engine} position="right" />}
+      {outPort && <PortHandle port={outPort} engine={engine} position="right" variant={variant} />}
     </div>
   );
 }
@@ -211,12 +260,14 @@ class BpmnNodeFactory extends AbstractReactFactory<BpmnNodeModel, DiagramEngine>
 
 function stylizeLink(link: DefaultLinkModel, label?: string, color = palette.highlight) {
   link.setColor(color);
-  link.setWidth(2.1);
-  link.getOptions().curvyness = 45;
+  link.setWidth(2.6);
+  link.getOptions().curvyness = 35;
+  link.getOptions().selectedColor = color;
+  link.getOptions().selectedWidth = 3;
   if (label) {
     link.addLabel(label);
   }
-  link.setLocked(true);
+  link.setLocked(false);
 }
 
 export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) {
@@ -232,7 +283,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       variant: "event",
       tech: "Webhook WhatsApp",
       inPort: false,
-      color: palette.event,
+      color: palette.event.base,
     });
     inicio.addPort(new DefaultPortModel({ alignment: PortModelAlignment.RIGHT, in: false, name: "out" }));
     inicio.setPosition(80, 260);
@@ -241,7 +292,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       label: "Analizar intención",
       variant: "task",
       tech: "n8n webhook",
-      color: palette.task,
+      color: palette.task.base,
     });
     analisis.setPosition(280, 260);
 
@@ -249,7 +300,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       label: "Visa o vuelo?",
       variant: "gateway",
       tech: "Decisión",
-      color: palette.gateway,
+      color: palette.gateway.base,
     });
     gateway.setPosition(480, 260);
 
@@ -257,7 +308,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       label: "Obtener info visa",
       variant: "task",
       tech: "Supabase select",
-      color: palette.task,
+      color: palette.task.base,
     });
     visaDoc.setPosition(680, 140);
 
@@ -265,7 +316,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       label: "Enviar plantilla",
       variant: "task",
       tech: "WhatsApp template",
-      color: palette.task,
+      color: palette.task.base,
     });
     visaPlantilla.setPosition(880, 140);
 
@@ -273,7 +324,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       label: "Fin información",
       variant: "event",
       tech: "Usuario informado",
-      color: palette.event,
+      color: palette.event.base,
       outPort: false,
     });
     visaFin.setPosition(1080, 140);
@@ -282,7 +333,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       label: "Flow recolección",
       variant: "subprocess",
       tech: "WhatsApp Flow",
-      color: palette.subprocess,
+      color: palette.subprocess.base,
     });
     subFlow.setPosition(680, 380);
 
@@ -290,7 +341,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       label: "Validar datos",
       variant: "task",
       tech: "n8n function",
-      color: palette.task,
+      color: palette.task.base,
     });
     validar.setPosition(880, 380);
 
@@ -298,7 +349,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       label: "Guardar cotización",
       variant: "task",
       tech: "Supabase insert",
-      color: palette.task,
+      color: palette.task.base,
     });
     guardar.setPosition(1080, 380);
 
@@ -306,7 +357,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       label: "Asignar agente",
       variant: "task",
       tech: "n8n trigger",
-      color: palette.task,
+      color: palette.task.base,
     });
     asignar.setPosition(1280, 380);
 
@@ -314,7 +365,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       label: "Notificar agente",
       variant: "task",
       tech: "Correo/WebSocket",
-      color: palette.task,
+      color: palette.task.base,
     });
     notificar.setPosition(1480, 380);
 
@@ -322,7 +373,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       label: "Agente responde",
       variant: "task",
       tech: "Next.js UI",
-      color: palette.task,
+      color: palette.task.base,
     });
     manual.setPosition(1680, 380);
 
@@ -330,7 +381,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       label: "Cliente recibe",
       variant: "event",
       tech: "Cotización enviada",
-      color: palette.event,
+      color: palette.event.base,
       outPort: false,
     });
     vueloFin.setPosition(1880, 380);
@@ -339,7 +390,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       label: "Subproceso métricas",
       variant: "subprocess",
       tech: "n8n paralelo",
-      color: palette.subprocess,
+      color: palette.subprocess.base,
     });
     metricas.setPosition(1280, 540);
 
@@ -347,7 +398,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       label: "Registrar tiempos",
       variant: "task",
       tech: "Supabase update",
-      color: palette.task,
+      color: palette.task.base,
     });
     metricasUpdate.setPosition(1480, 540);
 
@@ -355,7 +406,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       label: "Fin métricas",
       variant: "event",
       tech: "Dashboard",
-      color: palette.event,
+      color: palette.event.base,
       outPort: false,
     });
     metricasFin.setPosition(1680, 540);
@@ -379,7 +430,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       metricasFin,
     ];
 
-    allNodes.forEach((node) => node.setLocked(true));
+    allNodes.forEach((node) => node.setLocked(false));
 
     const connect = (from: BpmnNodeModel, to: BpmnNodeModel, text?: string, color?: string) => {
       const source = from.getPort("out");
@@ -390,34 +441,41 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       return link;
     };
 
+    const branchVisaColor = palette.subprocess.accent;
+    const branchFlightColor = palette.task.accent;
+    const parallelColor = palette.gateway.accent;
+    const supabaseAccent = "#34d399";
+
     const links = [
-      connect(inicio, analisis, "Webhook", palette.highlight),
-      connect(analisis, gateway, "n8n decide", palette.highlight),
-      connect(gateway, visaDoc, "Rama visa", "#22d3ee"),
-      connect(visaDoc, visaPlantilla, "Supabase", "#34d399"),
-      connect(visaPlantilla, visaFin, "Template", palette.highlight),
-      connect(gateway, subFlow, "Rama vuelo", palette.highlight),
-      connect(subFlow, validar, "Flow completado", "#22d3ee"),
-      connect(validar, guardar, "Datos válidos", "#34d399"),
-      connect(guardar, asignar, "Supabase id", "#34d399"),
+      connect(inicio, analisis, "Webhook", palette.event.accent),
+      connect(analisis, gateway, "Clasifica", palette.gateway.accent),
+      connect(gateway, visaDoc, "Rama visa", branchVisaColor),
+      connect(visaDoc, visaPlantilla, "Supabase", supabaseAccent),
+      connect(visaPlantilla, visaFin, "Plantilla", branchVisaColor),
+      connect(gateway, subFlow, "Rama vuelo", branchFlightColor),
+      connect(subFlow, validar, "Flow completado", branchFlightColor),
+      connect(validar, guardar, "Datos validos", supabaseAccent),
+      connect(guardar, asignar, "Supabase id", supabaseAccent),
       connect(asignar, notificar, "Seleccion agente", palette.highlight),
       connect(notificar, manual, "Aviso", palette.highlight),
       connect(manual, vueloFin, "Respuesta", palette.highlight),
-      connect(asignar, metricas, "Evento paralelo", "#a855f7"),
-      connect(metricas, metricasUpdate, "Cronómetro", "#a855f7"),
-      connect(metricasUpdate, metricasFin, "Dashboard", "#a855f7"),
+      connect(asignar, metricas, "Evento paralelo", parallelColor),
+      connect(metricas, metricasUpdate, "Cronometro", parallelColor),
+      connect(metricasUpdate, metricasFin, "Dashboard", parallelColor),
     ].filter(Boolean);
 
     model.addAll(...allNodes, ...(links as DefaultLinkModel[]));
-    model.setLocked(true);
+    model.setLocked(false);
 
     return model;
   }, []);
 
-  const { engine, fitMargin } = useDiagramEngine(buildModel, [], { zoomToFit: false, fitMargin: 80 });
+  const { engine, fitMargin } = useDiagramEngine(buildModel, [], { zoomToFit: true, fitMargin: 120 });
 
-  return <DiagramViewport engine={engine} variant={frame} className={className} fitMargin={fitMargin} />;
+  return <DiagramViewport engine={engine} variant={frame} className={className} fitMargin={fitMargin} height="spacious" />;
 }
+
+
 
 
 

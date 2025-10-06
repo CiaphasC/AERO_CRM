@@ -114,7 +114,7 @@ export function SequenceDiagram() {
       const node = new LifelineNodeModel({ label: name, height });
       node.setPosition(position.x, position.y);
       node.setSelected(false);
-      node.setLocked(true);
+      node.setLocked(false);
       return node;
     };
 
@@ -140,7 +140,7 @@ export function SequenceDiagram() {
         if (label) {
           link.addLabel(label);
         }
-        link.setLocked(true);
+        link.setLocked(false);
         return link;
       };
     })();
@@ -154,7 +154,7 @@ export function SequenceDiagram() {
     const gds = createLifelineNode({ name: "GDS", position: { x: 1160, y: 100 } });
 
     const lifelines = [user, whatsapp, next, n8n, supabase, agent, gds];
-    lifelines.forEach((node) => node.setLocked(true));
+    lifelines.forEach((node) => node.setLocked(false));
 
     const messages = [
       createMessage(user, whatsapp, "Mensaje inicial"),
@@ -170,7 +170,7 @@ export function SequenceDiagram() {
     ].filter((link): link is DefaultLinkModel => Boolean(link));
 
     model.addAll(...lifelines, ...messages);
-    model.setLocked(true);
+    model.setLocked(false);
 
     return model;
   }, []);
@@ -179,6 +179,7 @@ export function SequenceDiagram() {
 
   return <DiagramViewport engine={engine} fitMargin={fitMargin} />;
 }
+
 
 
 

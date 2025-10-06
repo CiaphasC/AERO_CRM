@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Skywave Studio | WhatsApp CRM Diagrams",
+  title: "Airbridge Labs | WhatsApp CRM Diagrams",
   description:
     "Diagramas interactivos de arquitectura y operaciones para un CRM conversacional en WhatsApp.",
 };
@@ -42,7 +42,7 @@ export default function RootLayout({
             </main>
             <footer className="border-t border-white/10 bg-[#050815]/95 py-6">
               <div className="mx-auto flex w-full max-w-[92rem] flex-col gap-2 px-6 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:px-10 xl:px-16">
-                <span>c {year} Skywave Studio - Conversational Flightdeck</span>
+                <span>c {year} Airbridge Labs - Conversational Control Tower</span>
                 <span className="text-slate-500">Diagramas curados con Next.js, React Diagrams y Supabase</span>
               </div>
             </footer>
@@ -52,6 +52,7 @@ export default function RootLayout({
     </html>
   );
 }
+
 
 
 

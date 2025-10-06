@@ -41,11 +41,11 @@ export function SiteHeader() {
         <div className="flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-3 whitespace-nowrap">
             <span className="relative inline-flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-sky-500 via-cyan-400 to-indigo-500 text-sm font-semibold text-slate-950 shadow-[0_20px_60px_-25px_rgba(56,189,248,0.75)] ring-1 ring-white/50">
-              SS
+              AL
             </span>
             <div className="leading-tight">
-              <p className="text-base font-semibold text-white">Skywave Studio</p>
-              <p className="text-xs uppercase tracking-[0.28em] text-slate-300">Conversational Flightdeck</p>
+              <p className="text-base font-semibold text-white">Airbridge Labs</p>
+              <p className="text-xs uppercase tracking-[0.28em] text-slate-300">Conversational Control Tower</p>
             </div>
           </Link>
           <div className="flex items-center gap-2">

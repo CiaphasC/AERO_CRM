@@ -34,7 +34,7 @@ export default async function Home() {
             CRM conversacional para agencias de viaje con bots y asesores humanos.
           </h1>
           <p className="text-base text-slate-300 sm:text-lg">
-            Documentacion visual de Skywave Studio: captura por WhatsApp, clasificacion en n8n, persistencia en Supabase y atencion en una interfaz Next.js. Cada diagrama explica decisiones tecnicas listas para produccion.
+            Documentacion visual de Airbridge Labs: captura por WhatsApp, clasificacion en n8n, persistencia en Supabase y atencion en una interfaz Next.js. Cada diagrama explica decisiones tecnicas listas para produccion.
           </p>
           <div className="flex flex-wrap gap-2 pt-2 text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
             {highlights.map((item) => (
@@ -130,4 +130,5 @@ export default async function Home() {
     </div>
   );
 }
+
 
