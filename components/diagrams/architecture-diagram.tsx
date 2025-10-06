@@ -95,14 +95,14 @@ export function ArchitectureDiagram() {
       const client = createNode({
         name: "Cliente WhatsApp",
         color: palette.client,
-        position: { x: 80, y: 320 },
+        position: { x: 120, y: 280 },
         outPorts: ["mensaje"],
       });
 
       const gateway = createNode({
         name: "Gateway Next.js",
         color: palette.gateway,
-        position: { x: 340, y: 200 },
+        position: { x: 380, y: 200 },
         inPorts: ["webhook"],
         outPorts: ["evento bot", "flow"],
       });
@@ -110,7 +110,7 @@ export function ArchitectureDiagram() {
       const bot = createNode({
         name: "Bot Conversacional",
         color: palette.bot,
-        position: { x: 600, y: 120 },
+        position: { x: 640, y: 120 },
         inPorts: ["evento"],
         outPorts: ["payload"],
       });
@@ -118,7 +118,7 @@ export function ArchitectureDiagram() {
       const flows = createNode({
         name: "WhatsApp Flows",
         color: palette.flow,
-        position: { x: 600, y: 320 },
+        position: { x: 640, y: 280 },
         inPorts: ["activar"],
         outPorts: ["datos"],
       });
@@ -126,7 +126,7 @@ export function ArchitectureDiagram() {
       const orchestrator = createNode({
         name: "n8n Orchestrator",
         color: palette.orchestrator,
-        position: { x: 860, y: 220 },
+        position: { x: 900, y: 200 },
         inPorts: ["payload"],
         outPorts: ["resultado", "evento"],
       });
@@ -134,7 +134,7 @@ export function ArchitectureDiagram() {
       const supabase = createNode({
         name: "Supabase",
         color: palette.supabase,
-        position: { x: 1120, y: 180 },
+        position: { x: 1160, y: 140 },
         inPorts: ["guardar"],
         outPorts: ["consultar"],
       });
@@ -142,14 +142,14 @@ export function ArchitectureDiagram() {
       const analytics = createNode({
         name: "Analytics",
         color: palette.analytics,
-        position: { x: 1120, y: 360 },
+        position: { x: 1160, y: 280 },
         inPorts: ["evento"],
       });
 
       const agent = createNode({
         name: "Agente CRM",
         color: palette.agent,
-        position: { x: 860, y: 420 },
+        position: { x: 900, y: 360 },
         inPorts: ["caso"],
         outPorts: ["respuesta"],
       });
@@ -157,7 +157,7 @@ export function ArchitectureDiagram() {
       const whatsapp = createNode({
         name: "WhatsApp API",
         color: palette.whatsapp,
-        position: { x: 1120, y: 520 },
+        position: { x: 1160, y: 420 },
         inPorts: ["mensaje"],
         outPorts: ["al cliente"],
       });
@@ -180,10 +180,10 @@ export function ArchitectureDiagram() {
         connect(bot, orchestrator, { label: "Evento limpio", fromPort: "payload", toPort: "payload" }),
         connect(gateway, flows, { label: "Flow", fromPort: "flow", toPort: "activar" }),
         connect(flows, orchestrator, { label: "Datos flow", fromPort: "datos", toPort: "payload" }),
-        connect(orchestrator, supabase, { label: "Persistencia", fromPort: "resultado", toPort: "guardar" }),
+        connect(orchestrator, supabase, { label: "Consultas", fromPort: "resultado", toPort: "guardar" }),
         connect(supabase, orchestrator, { label: "Consultas", fromPort: "consultar", toPort: "payload" }),
-        connect(orchestrator, analytics, { label: "Metricas", fromPort: "evento", toPort: "evento" }),
-        connect(orchestrator, agent, { label: "Asignacion", fromPort: "resultado", toPort: "caso" }),
+        connect(orchestrator, analytics, { label: "Métricas", fromPort: "evento", toPort: "evento" }),
+        connect(orchestrator, agent, { label: "Asignación", fromPort: "resultado", toPort: "caso" }),
         connect(agent, whatsapp, { label: "Respuesta", fromPort: "respuesta", toPort: "mensaje" }),
         connect(whatsapp, client, { label: "Mensaje final", fromPort: "al cliente", toPort: "mensaje" }),
       ].filter((link): link is DefaultLinkModel => Boolean(link));
@@ -196,9 +196,9 @@ export function ArchitectureDiagram() {
     [],
   );
 
-  const { engine, fitMargin } = useDiagramEngine(buildModel, [], { zoomToFit: true, fitMargin: 90 });
+  const { engine, fitMargin } = useDiagramEngine(buildModel, [], { zoomToFit: false, fitMargin: 80 });
 
-  return <DiagramViewport engine={engine} fitMargin={fitMargin} />;
+  return <DiagramViewport engine={engine} fitMargin={fitMargin} height="spacious" />;
 }
 
 

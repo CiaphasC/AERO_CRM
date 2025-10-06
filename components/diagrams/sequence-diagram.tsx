@@ -145,13 +145,13 @@ export function SequenceDiagram() {
       };
     })();
 
-    const user = createLifelineNode({ name: "Usuario", position: { x: 40, y: 80 } });
-    const whatsapp = createLifelineNode({ name: "WhatsApp API", position: { x: 220, y: 80 } });
-    const next = createLifelineNode({ name: "Next.js Bot", position: { x: 400, y: 80 } });
-    const n8n = createLifelineNode({ name: "n8n", position: { x: 580, y: 80 } });
-    const supabase = createLifelineNode({ name: "Supabase", position: { x: 760, y: 80 } });
-    const agent = createLifelineNode({ name: "Agente", position: { x: 940, y: 80 } });
-    const gds = createLifelineNode({ name: "GDS", position: { x: 1120, y: 80 } });
+    const user = createLifelineNode({ name: "Usuario", position: { x: 80, y: 100 } });
+    const whatsapp = createLifelineNode({ name: "WhatsApp API", position: { x: 260, y: 100 } });
+    const next = createLifelineNode({ name: "Next.js Bot", position: { x: 440, y: 100 } });
+    const n8n = createLifelineNode({ name: "n8n", position: { x: 620, y: 100 } });
+    const supabase = createLifelineNode({ name: "Supabase", position: { x: 800, y: 100 } });
+    const agent = createLifelineNode({ name: "Agente", position: { x: 980, y: 100 } });
+    const gds = createLifelineNode({ name: "GDS", position: { x: 1160, y: 100 } });
 
     const lifelines = [user, whatsapp, next, n8n, supabase, agent, gds];
     lifelines.forEach((node) => node.setLocked(true));
@@ -175,7 +175,7 @@ export function SequenceDiagram() {
     return model;
   }, []);
 
-  const { engine, fitMargin } = useDiagramEngine(buildModel, [], { zoomToFit: true, fitMargin: 120 });
+  const { engine, fitMargin } = useDiagramEngine(buildModel, [], { zoomToFit: false, fitMargin: 80 });
 
   return <DiagramViewport engine={engine} fitMargin={fitMargin} />;
 }

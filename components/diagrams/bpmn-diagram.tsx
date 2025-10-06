@@ -235,7 +235,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       color: palette.event,
     });
     inicio.addPort(new DefaultPortModel({ alignment: PortModelAlignment.RIGHT, in: false, name: "out" }));
-    inicio.setPosition(40, 240);
+    inicio.setPosition(80, 260);
 
     const analisis = new BpmnNodeModel({
       label: "Analizar intención",
@@ -243,7 +243,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       tech: "n8n webhook",
       color: palette.task,
     });
-    analisis.setPosition(220, 220);
+    analisis.setPosition(280, 260);
 
     const gateway = new BpmnNodeModel({
       label: "Visa o vuelo?",
@@ -251,7 +251,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       tech: "Decisión",
       color: palette.gateway,
     });
-    gateway.setPosition(420, 220);
+    gateway.setPosition(480, 260);
 
     const visaDoc = new BpmnNodeModel({
       label: "Obtener info visa",
@@ -259,7 +259,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       tech: "Supabase select",
       color: palette.task,
     });
-    visaDoc.setPosition(620, 120);
+    visaDoc.setPosition(680, 140);
 
     const visaPlantilla = new BpmnNodeModel({
       label: "Enviar plantilla",
@@ -267,7 +267,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       tech: "WhatsApp template",
       color: palette.task,
     });
-    visaPlantilla.setPosition(820, 120);
+    visaPlantilla.setPosition(880, 140);
 
     const visaFin = new BpmnNodeModel({
       label: "Fin información",
@@ -276,7 +276,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       color: palette.event,
       outPort: false,
     });
-    visaFin.setPosition(1020, 120);
+    visaFin.setPosition(1080, 140);
 
     const subFlow = new BpmnNodeModel({
       label: "Flow recolección",
@@ -284,7 +284,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       tech: "WhatsApp Flow",
       color: palette.subprocess,
     });
-    subFlow.setPosition(620, 360);
+    subFlow.setPosition(680, 380);
 
     const validar = new BpmnNodeModel({
       label: "Validar datos",
@@ -292,7 +292,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       tech: "n8n function",
       color: palette.task,
     });
-    validar.setPosition(820, 360);
+    validar.setPosition(880, 380);
 
     const guardar = new BpmnNodeModel({
       label: "Guardar cotización",
@@ -300,7 +300,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       tech: "Supabase insert",
       color: palette.task,
     });
-    guardar.setPosition(1020, 360);
+    guardar.setPosition(1080, 380);
 
     const asignar = new BpmnNodeModel({
       label: "Asignar agente",
@@ -308,7 +308,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       tech: "n8n trigger",
       color: palette.task,
     });
-    asignar.setPosition(1220, 360);
+    asignar.setPosition(1280, 380);
 
     const notificar = new BpmnNodeModel({
       label: "Notificar agente",
@@ -316,7 +316,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       tech: "Correo/WebSocket",
       color: palette.task,
     });
-    notificar.setPosition(1420, 360);
+    notificar.setPosition(1480, 380);
 
     const manual = new BpmnNodeModel({
       label: "Agente responde",
@@ -324,7 +324,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       tech: "Next.js UI",
       color: palette.task,
     });
-    manual.setPosition(1620, 360);
+    manual.setPosition(1680, 380);
 
     const vueloFin = new BpmnNodeModel({
       label: "Cliente recibe",
@@ -333,7 +333,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       color: palette.event,
       outPort: false,
     });
-    vueloFin.setPosition(1820, 360);
+    vueloFin.setPosition(1880, 380);
 
     const metricas = new BpmnNodeModel({
       label: "Subproceso métricas",
@@ -341,7 +341,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       tech: "n8n paralelo",
       color: palette.subprocess,
     });
-    metricas.setPosition(1220, 520);
+    metricas.setPosition(1280, 540);
 
     const metricasUpdate = new BpmnNodeModel({
       label: "Registrar tiempos",
@@ -349,7 +349,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       tech: "Supabase update",
       color: palette.task,
     });
-    metricasUpdate.setPosition(1420, 520);
+    metricasUpdate.setPosition(1480, 540);
 
     const metricasFin = new BpmnNodeModel({
       label: "Fin métricas",
@@ -358,7 +358,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
       color: palette.event,
       outPort: false,
     });
-    metricasFin.setPosition(1620, 520);
+    metricasFin.setPosition(1680, 540);
 
     const allNodes = [
       inicio,
@@ -414,7 +414,7 @@ export function BpmnDiagram({ className, frame = "surface" }: BpmnDiagramProps) 
     return model;
   }, []);
 
-  const { engine, fitMargin } = useDiagramEngine(buildModel, [], { zoomToFit: true, fitMargin: 160 });
+  const { engine, fitMargin } = useDiagramEngine(buildModel, [], { zoomToFit: false, fitMargin: 80 });
 
   return <DiagramViewport engine={engine} variant={frame} className={className} fitMargin={fitMargin} />;
 }

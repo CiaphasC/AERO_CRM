@@ -149,21 +149,21 @@ export function UmlDiagram() {
       fields: ["id: uuid", "wa_id: string", "nombre: string", "fecha_creacion: timestamp"],
       color: "#38bdf8",
     });
-    usuario.setPosition(80, 240);
+    usuario.setPosition(120, 280);
 
     const conversacion = new ClassNodeModel({
       name: "Conversación",
       fields: ["id: uuid", "usuario_id: uuid", "estado: enum", "fecha_ultima: timestamp"],
       color: "#3b82f6",
     });
-    conversacion.setPosition(380, 120);
+    conversacion.setPosition(420, 160);
 
     const flujo = new ClassNodeModel({
       name: "Flujo",
       fields: ["id: uuid", "tipo: enum", "datos: jsonb", "estado: enum", "n8n_workflow_id: string"],
       color: "#22d3ee",
     });
-    flujo.setPosition(700, 40);
+    flujo.setPosition(740, 80);
 
     const cotizacion = new ClassNodeModel({
       name: "Cotización",
@@ -180,21 +180,21 @@ export function UmlDiagram() {
       ],
       color: "#10b981",
     });
-    cotizacion.setPosition(700, 280);
+    cotizacion.setPosition(740, 320);
 
     const agente = new ClassNodeModel({
       name: "Agente",
       fields: ["id: uuid", "nombre: string", "especialidad: string", "disponible: boolean", "supabase_user_id: uuid"],
       color: "#a855f7",
     });
-    agente.setPosition(1020, 280);
+    agente.setPosition(1060, 320);
 
     const mensaje = new ClassNodeModel({
       name: "Mensaje",
       fields: ["id: uuid", "conversacion_id: uuid", "remitente: enum", "contenido: text", "timestamp: timestamptz"],
       color: "#f97316",
     });
-    mensaje.setPosition(380, 360);
+    mensaje.setPosition(420, 400);
 
     const nodes = [usuario, conversacion, flujo, cotizacion, agente, mensaje];
     nodes.forEach((node) => node.setLocked(true));
@@ -234,7 +234,7 @@ export function UmlDiagram() {
     return model;
   }, []);
 
-  const { engine, fitMargin } = useDiagramEngine(buildModel, [], { zoomToFit: true, fitMargin: 110 });
+  const { engine, fitMargin } = useDiagramEngine(buildModel, [], { zoomToFit: false, fitMargin: 80 });
 
   return <DiagramViewport engine={engine} fitMargin={fitMargin} />;
 }

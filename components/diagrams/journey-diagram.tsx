@@ -249,15 +249,13 @@ function connectLink(
 
 export function JourneyDiagram({ blueprint }: JourneyDiagramProps) {
   const surfaceStyle = useMemo(() => {
-    const canvasHeight = blueprint.canvas?.height ?? 720;
-    const verticalPadding = 220;
-    const minHeight = 620;
-    const maxHeight = 980;
-    const computedHeight = Math.max(minHeight, Math.min(canvasHeight + verticalPadding, maxHeight));
+    const canvasHeight = blueprint.canvas?.height ?? 600;
+    const verticalPadding = 100;
+    const computedHeight = canvasHeight + verticalPadding;
 
     return {
       height: `${computedHeight}px`,
-      minHeight: `${minHeight}px`,
+      minHeight: `${computedHeight}px`,
     } as const;
   }, [blueprint.canvas?.height]);
 
@@ -295,8 +293,8 @@ export function JourneyDiagram({ blueprint }: JourneyDiagramProps) {
   );
 
   const { engine, fitMargin } = useDiagramEngine(buildModel, [blueprint], {
-    zoomToFit: true,
-    fitMargin: 140,
+    zoomToFit: false,
+    fitMargin: 80,
   });
 
   return (

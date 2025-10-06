@@ -71,36 +71,56 @@ export function useDiagramEngine(
 
     setEngine(engineInstance);
 
-    let rafId: ReturnType<typeof requestAnimationFrame> | null = null;
+    let listenerHandle: ReturnType<DiagramEngine["registerListener"]> | null = null;
     let cancelled = false;
+    let pendingFit: Promise<void> | null = null;
+    const fontsReadyPromise: Promise<unknown> =
+      typeof document === "undefined" || !("fonts" in document)
+        ? Promise.resolve()
+        : ((document as Document & { fonts: FontFaceSet }).fonts.ready as Promise<unknown>).catch(() => undefined);
+
+    const runZoomToFit = () => {
+      if (cancelled || options.zoomToFit === false) {
+        return;
+      }
+
+      engineInstance.zoomToFitNodes({ margin: fitMargin });
+      engineInstance.repaintCanvas();
+    };
+
+    const requestZoomToFit = () => {
+      if (cancelled || options.zoomToFit === false) {
+        return Promise.resolve();
+      }
+
+      if (pendingFit) {
+        return pendingFit;
+      }
+
+      pendingFit = Promise.all([fontsReadyPromise, engineInstance.repaintCanvas(true)])
+        .then(() => {
+          pendingFit = null;
+          runZoomToFit();
+        })
+        .catch(() => {
+          pendingFit = null;
+        });
+
+      return pendingFit;
+    };
 
     if (options.zoomToFit !== false) {
-      const tryZoomToFit = () => {
-        if (cancelled) {
-          return;
-        }
-
-        const canvas = engineInstance.getCanvas();
-
-        if (!canvas) {
-          rafId = requestAnimationFrame(tryZoomToFit);
-          return;
-        }
-
-        engineInstance.zoomToFitNodes({ margin: fitMargin });
-        engineInstance.repaintCanvas();
-        rafId = null;
-      };
-
-      rafId = requestAnimationFrame(tryZoomToFit);
+      requestZoomToFit();
+      listenerHandle = engineInstance.registerListener({
+        canvasReady: requestZoomToFit,
+      });
     }
 
     return () => {
       cancelled = true;
-      if (rafId !== null) {
-        cancelAnimationFrame(rafId);
-        rafId = null;
-      }
+      listenerHandle?.deregister();
+      listenerHandle = null;
+      pendingFit = null;
       engineInstance.setModel(new DiagramModel());
       setEngine(null);
     };

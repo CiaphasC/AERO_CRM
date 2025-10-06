@@ -5,9 +5,9 @@ export type DiagramSurfaceVariant = "surface" | "bare";
 export type DiagramSurfaceHeight = "standard" | "spacious" | "compact" | "none";
 
 const HEIGHT_PRESETS: Record<Exclude<DiagramSurfaceHeight, "none">, string> = {
-  standard: "clamp(500px, 96vh, 940px)",
-  spacious: "clamp(560px, 100vh, 1000px)",
-  compact: "clamp(420px, 88vh, 780px)",
+  standard: "700px",
+  spacious: "800px",
+  compact: "600px",
 };
 
 interface DiagramSurfaceProps {

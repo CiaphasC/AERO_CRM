@@ -35,16 +35,18 @@ body {
 :is(.diagram-surface, [data-diagram-surface]) .diagram-layer.widget-diagram-layer,
 :is(.diagram-surface, [data-diagram-surface]) .storm-diagrams-canvas {
   position: relative;
-  background: radial-gradient(circle at 20% 15%, rgba(37, 99, 235, 0.09), transparent 55%),
-    linear-gradient(135deg, rgba(7, 11, 19, 0.96), rgba(3, 5, 11, 0.98));
+  background: radial-gradient(circle at 20% 15%, rgba(37, 99, 235, 0.06), transparent 55%),
+    linear-gradient(135deg, rgba(7, 11, 19, 0.98), rgba(3, 5, 11, 0.99));
+  overflow: visible;
 }
 
 :is(.diagram-surface, [data-diagram-surface]) .default-node {
   border-radius: 0.85rem;
-  border: 1px solid rgba(148, 163, 184, 0.18);
+  border: 1px solid rgba(148, 163, 184, 0.25);
   color: #cbd5f5;
-  box-shadow: 0 16px 32px rgba(2, 6, 23, 0.55);
+  box-shadow: 0 12px 24px rgba(2, 6, 23, 0.45);
   backdrop-filter: blur(4px);
+  min-width: 140px;
 }
 
 :is(.diagram-surface, [data-diagram-surface]) .default-node__title {
@@ -69,7 +71,12 @@ body {
 }
 
 :is(.diagram-surface, [data-diagram-surface]) .link-layer {
-  filter: drop-shadow(0 10px 22px rgba(37, 99, 235, 0.22));
+  filter: drop-shadow(0 8px 16px rgba(37, 99, 235, 0.18));
+}
+
+:is(.diagram-surface, [data-diagram-surface]) .link-path {
+  stroke-width: 2.5px;
+  stroke-linecap: round;
 }
 
 :is(.diagram-surface, [data-diagram-surface]) .port-label {
