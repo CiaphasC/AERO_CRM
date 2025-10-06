@@ -3,12 +3,14 @@
 import { useCallback } from "react";
 import { DiagramModel, DefaultLinkModel, type DiagramEngine } from "@projectstorm/react-diagrams";
 import { AbstractReactFactory } from "@projectstorm/react-canvas-core";
+import type { BasePositionModelOptions } from "@projectstorm/react-canvas-core";
 import { DiagramViewport } from "@/components/diagram-viewport";
 import { useDiagramEngine } from "@/lib/diagram/use-diagram-engine";
 import type { NodeModelGenerics } from "@projectstorm/react-diagrams-core/dist/@types/entities/node/NodeModel";
 import { NodeModel, PortModel, PortModelAlignment, PortWidget } from "@projectstorm/react-diagrams-core";
 import { DefaultPortModel } from "@projectstorm/react-diagrams-defaults";
 import type { DefaultPortModelOptions } from "@projectstorm/react-diagrams-defaults";
+import { Point } from "@projectstorm/geometry";
 
 interface ClassOptions {
   name: string;
@@ -20,8 +22,8 @@ interface ClassOptions {
 
 type ClassConfig = ClassOptions & { type?: string };
 
-type ClassNodeGenerics = NodeModelGenerics & {
-  OPTIONS: ClassConfig;
+type ClassNodeGenerics = Omit<NodeModelGenerics, "OPTIONS"> & {
+  OPTIONS: BasePositionModelOptions & ClassConfig;
 };
 
 const palette = {
@@ -45,7 +47,11 @@ function withAlpha(hex: string, alpha: number) {
 
 class ClassNodeModel extends NodeModel<ClassNodeGenerics> {
   constructor(options: ClassOptions) {
-    super({ type: "class-node" });
+    const positionPoint = new Point(options.position.x, options.position.y);
+    super({
+      type: "class-node",
+      position: positionPoint,
+    } as BasePositionModelOptions & ClassConfig);
 
     this.options = {
       ...this.options,
@@ -306,8 +312,6 @@ export function UmlDiagram() {
       link.setWidth(lineWidth);
       link.getOptions().curvyness = style.curvyness ?? 14;
       link.getOptions().selectedColor = accent;
-      link.getOptions().selectedWidth = lineWidth + 0.6;
-      link.getOptions().hoverWidth = lineWidth + 0.4;
       link.addLabel(labelFrom);
       link.addLabel(labelTo);
       if (note) {

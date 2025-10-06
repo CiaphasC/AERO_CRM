@@ -263,7 +263,6 @@ function stylizeLink(link: DefaultLinkModel, label?: string, color = palette.hig
   link.setWidth(2.6);
   link.getOptions().curvyness = 35;
   link.getOptions().selectedColor = color;
-  link.getOptions().selectedWidth = 3;
   if (label) {
     link.addLabel(label);
   }

@@ -257,7 +257,6 @@ function connectLink(
   link.setWidth(width);
   link.getOptions().curvyness = definition.curvyness ?? defaults.curvyness;
   link.getOptions().selectedColor = accent;
-  link.getOptions().selectedWidth = width + 0.6;
   if (definition.label) {
     link.addLabel(definition.label);
   }
