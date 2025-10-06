@@ -1,5 +1,7 @@
 import { getCalendarContent } from "@/lib/data/content";
 
+export const dynamic = "force-dynamic";
+
 export default async function CalendarioPage() {
   const { events, monthTitle, modeLabel, summary, ctaLabel } = await getCalendarContent();
   const days = Array.from({ length: 31 }, (_, index) => index + 1);

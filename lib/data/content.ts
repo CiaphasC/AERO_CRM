@@ -217,26 +217,32 @@ const journeyContent: JourneyContent = {
   ],
 };
 
-const calendarContent: CalendarContent = {
-  events: [
-    { title: "Reunión con aerolínea", day: 3, color: "border-sky-400/50 bg-sky-500/15" },
-    { title: "Entrega cotizaciones grupales", day: 9, color: "border-emerald-400/40 bg-emerald-500/15" },
-    { title: "Capacitación agentes", day: 17, color: "border-indigo-400/40 bg-indigo-500/15" },
-    { title: "Cierre KPI mensual", day: 28, color: "border-amber-400/40 bg-amber-500/15" },
-  ],
-  monthTitle: "Octubre 2024",
-  modeLabel: "Modo colaborativo",
-  summary:
-    "Consolida hitos comerciales, capacitaciones y entregables críticos para coordinar la atención en WhatsApp.",
-  ctaLabel: "Crear nuevo evento",
-};
+function createCalendarContent(): CalendarContent {
+  const now = new Date();
+  const monthName = new Intl.DateTimeFormat("es-ES", { month: "long" }).format(now);
+  const capitalizedMonth = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+
+  return {
+    events: [
+      { title: "Reunión con aerolínea", day: 3, color: "border-sky-400/50 bg-sky-500/15" },
+      { title: "Entrega cotizaciones grupales", day: 9, color: "border-emerald-400/40 bg-emerald-500/15" },
+      { title: "Capacitación agentes", day: 17, color: "border-indigo-400/40 bg-indigo-500/15" },
+      { title: "Cierre KPI mensual", day: 28, color: "border-amber-400/40 bg-amber-500/15" },
+    ],
+    monthTitle: `${capitalizedMonth} ${now.getFullYear()}`,
+    modeLabel: "Modo colaborativo",
+    summary:
+      "Consolida hitos comerciales, capacitaciones y entregables críticos para coordinar la atención en WhatsApp.",
+    ctaLabel: "Crear nuevo evento",
+  };
+}
 
 const contentLoaders = {
   home: async () => homeContent,
   journey: async () => journeyContent,
   bpmn: async () => bpmnContent,
   arquitectura: async () => architectureContent,
-  calendario: async () => calendarContent,
+  calendario: async () => createCalendarContent(),
 };
 
 export async function getHomeContent(): Promise<HomeContent> {
